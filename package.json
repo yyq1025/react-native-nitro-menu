@@ -1,7 +1,7 @@
 {
-  "name": "react-native-nitro-contextmenu",
-  "version": "2026.4.2",
-  "description": "Native context menus built with Nitro Modules",
+  "name": "@yyq1025/react-native-nitro-menu",
+  "version": "0.1.0",
+  "description": "Native iOS & Android menus — tap menus and long-press context menus with a working lift preview — built with Nitro Modules. Fork of react-native-nitro-contextmenu.",
   "main": "lib/index",
   "module": "lib/index",
   "types": "lib/index.d.ts",
@@ -49,22 +49,25 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vineyardbovines/react-native-nitro-contextmenu.git"
+    "url": "git+https://github.com/yyq1025/react-native-nitro-menu.git"
   },
-  "author": "Spencer Pope <spencer@thepope.dev>",
+  "author": "Yueqian Yang <yangyueqian1025@gmail.com>",
+  "contributors": [
+    "Spencer Pope <spencer@thepope.dev> (original author of react-native-nitro-contextmenu)"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/vineyardbovines/react-native-nitro-contextmenu/issues"
+    "url": "https://github.com/yyq1025/react-native-nitro-menu/issues"
   },
-  "homepage": "https://github.com/vineyardbovines/react-native-nitro-contextmenu#readme",
+  "homepage": "https://github.com/yyq1025/react-native-nitro-menu#readme",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.15",
     "@commitlint/config-conventional": "^20.4.1",
     "@types/react": "^19.1.03",
-    "@vineyardbovines/calver": "^2026.1.1",
     "auto-changelog": "^2.5.0",
     "commitlint": "^20.4.1",
     "lefthook": "^2.1.1",

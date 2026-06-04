@@ -1,6 +1,13 @@
-# react-native-nitro-contextmenu
+# @yyq1025/react-native-nitro-menu
 
-Native context menus built with [Nitro Modules](https://nitro.margelo.com). Supports actions, submenus, selection state, inline groups, palettes, tabbed menus, and tap-to-trigger.
+Native iOS & Android menus built with [Nitro Modules](https://nitro.margelo.com) — tap menus and long-press context menus with a working lift preview. Supports actions, submenus, selection state, inline groups, palettes, and tabbed menus.
+
+> **Fork of [`react-native-nitro-contextmenu`](https://github.com/vineyardbovines/react-native-nitro-contextmenu) by Spencer Pope.** What this fork adds:
+>
+> - **A working New Arch long-press lift preview.** The lifted card now renders the live trigger content — text included — instead of a blank/partial snapshot.
+> - **Safe inside virtualized lists** (`FlatList` / `SectionList` / LegendList). The native view is hosted in a dedicated, non-collapsible wrapper so the lift can't desync the recycler and trip the "unmount a view which has a different index" crash. See [Use in lists](#use-in-lists).
+>
+> MIT-licensed; original copyright retained.
 
 <p align="center">
   <img src="./assets/ios-demo.gif" alt="iOS Demo" width="300" />
@@ -10,7 +17,7 @@ Native context menus built with [Nitro Modules](https://nitro.margelo.com). Supp
 ## Installation
 
 ```sh
-npm install react-native-nitro-contextmenu react-native-nitro-modules
+npm install @yyq1025/react-native-nitro-menu react-native-nitro-modules
 ```
 
 For iOS, install pods:
@@ -24,8 +31,8 @@ Android requires no additional setup.
 ## Quick Start
 
 ```tsx
-import { ContextMenu } from "react-native-nitro-contextmenu";
-import type { MenuConfig } from "react-native-nitro-contextmenu";
+import { ContextMenu } from "@yyq1025/react-native-nitro-menu";
+import type { MenuConfig } from "@yyq1025/react-native-nitro-menu";
 
 function MyComponent() {
   const menuConfig: MenuConfig = {
@@ -52,6 +59,31 @@ function MyComponent() {
 }
 ```
 
+## Use in lists
+
+`ContextMenu` is safe to render directly as a list cell — no manual wrapping required. The component already hosts the native view in a dedicated, non-collapsible wrapper, which keeps the long-press lift from desyncing the list recycler (the New Arch "unmount a view which has a different index" crash). Put your cell layout (e.g. a fixed row height) on the `style` prop:
+
+```tsx
+<SectionList
+  sections={sections}
+  renderItem={({ item }) => (
+    <ContextMenu
+      trigger="longPress"
+      menuConfig={rowMenu(item)}
+      previewConfig={{ previewType: "view", borderRadius: 10, preferredCommitStyle: "dismiss" }}
+      onPressAction={onAction}
+      style={{ height: 52 }}
+    >
+      <View style={styles.row}>
+        <Text>{item.title}</Text>
+      </View>
+    </ContextMenu>
+  )}
+/>
+```
+
+> Using a CSS-in-JS library (NativeWind / uniwind)? Register the component once so `className` maps to `style`: `cssInterop(ContextMenu, { className: "style" })`. The library itself stays styling-agnostic and only accepts a plain `style`.
+
 ## Props
 
 | Prop              | Type                          | Description                                               |
@@ -63,6 +95,7 @@ function MyComponent() {
 | `onMenuWillHide`  | `() => void`                  | Called when the menu is about to disappear.               |
 | `onPreviewPress`  | `() => void`                  | Called when the user taps the preview (iOS only).         |
 | `previewConfig`   | `PreviewConfig`               | Customize the preview appearance (iOS only).              |
+| `style`           | `StyleProp<ViewStyle>`        | Style for the wrapper around the trigger content. Use it to size/lay out the cell (e.g. a fixed row height in a list). |
 | `children`        | `ReactNode`                   | **Required.** The trigger content.                        |
 
 ## Menu Configuration
@@ -346,7 +379,7 @@ import type {
   SystemImage,
   UrlImage,
   PreviewConfig,
-} from "react-native-nitro-contextmenu";
+} from "@yyq1025/react-native-nitro-menu";
 ```
 
 ## Platform Support
@@ -381,6 +414,10 @@ import type {
 
 Features are gracefully skipped on older iOS versions and unsupported Android features.
 
+## Credits
+
+Fork of [`react-native-nitro-contextmenu`](https://github.com/vineyardbovines/react-native-nitro-contextmenu) by [Spencer Pope](https://github.com/vineyardbovines). All of the original menu engine, Nitro wiring, and cross-platform work is his; this fork adds the New Arch lift-preview fix and list safety described above.
+
 ## License
 
-MIT
+MIT © [Spencer Pope](https://github.com/vineyardbovines) (original) and [Yueqian Yang](https://github.com/yyq1025) (modifications). See [LICENSE](./LICENSE).

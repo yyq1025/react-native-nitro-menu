@@ -43,6 +43,14 @@ private class ContextMenuContainerView: UIView, UIContextMenuInteractionDelegate
     private var menuButton: UIButton?
     private var tabState = TabState()
     private var trigger: String = "tap"
+    /// The host view we hand to the context-menu lift, plus where it sat in its
+    /// own superview. UIKit reparents the lifted view during the animation and
+    /// re-seats it at the wrong index afterwards; we restore the original index
+    /// when the menu ends so Fabric's child bookkeeping stays in sync (see
+    /// `restoreLiftedHostIndex()`).
+    private weak var liftedHost: UIView?
+    private weak var liftedHostParent: UIView?
+    private var liftedHostIndex: Int?
 
     var menuConfigJson: String = "{}" {
         didSet { configDidChange() }
@@ -208,6 +216,16 @@ private class ContextMenuContainerView: UIView, UIContextMenuInteractionDelegate
     ) {
         tabState = TabState()
         onMenuWillHide()
+        // Restore the lifted host's index once the dismiss animation finishes —
+        // after UIKit has handed it back, before the list can scroll and drive an
+        // unmount.
+        if let animator = animator {
+            animator.addCompletion { [weak self] in
+                self?.restoreLiftedHostIndex()
+            }
+        } else {
+            restoreLiftedHostIndex()
+        }
     }
 
     func contextMenuInteraction(
@@ -226,6 +244,9 @@ private class ContextMenuContainerView: UIView, UIContextMenuInteractionDelegate
 
         animator.addCompletion { [weak self] in
             self?.onPreviewPress()
+            // Commit ends the menu too; restore the host index here in case
+            // `willEndFor` doesn't fire on the commit path.
+            self?.restoreLiftedHostIndex()
         }
     }
 
@@ -233,22 +254,82 @@ private class ContextMenuContainerView: UIView, UIContextMenuInteractionDelegate
         _ interaction: UIContextMenuInteraction,
         previewForHighlightingMenuWithConfiguration configuration: UIContextMenuConfiguration
     ) -> UITargetedPreview? {
+        return makeContentPreview()
+    }
+
+    // MARK: - Lift preview (lift the live host, restore it on dismiss)
+    //
+    // RN's New Arch flattens `<View><Text>…</View>` into *sibling* views under
+    // the Nitro host (an `RCTViewComponentView`): one view paints the row
+    // background, a separate `RCTParagraphComponentView` paints the text, and
+    // this `containerView` sits alongside them — positioned by absolute frames,
+    // so they only *look* nested. The text lives in a sibling, not inside the
+    // background row.
+    //
+    // We lift the live `host` itself, which contains all those siblings, so
+    // UIKit's own preview shows the real on-screen rendering — text included —
+    // with no rasterization. (Rasterizing via `layer.render(in:)` worked but
+    // raced on fast open/close: the synchronous render could catch the text
+    // layer mid-redraw and produce a blank card. The live view never has that
+    // gap.)
+    //
+    // Lifting a live view has a cost: `UITargetedPreview` reparents its target
+    // during the animation and re-seats `host` at the wrong index in its
+    // superview afterwards, desyncing Fabric's child bookkeeping — the "unmount
+    // a view which has a different index" crash. We record host's index here and
+    // restore it in `restoreLiftedHostIndex()` once the menu ends, before any
+    // scroll can drive an unmount.
+    private func makeContentPreview() -> UITargetedPreview? {
+        guard let host = superview, host.bounds.width > 0, host.bounds.height > 0 else {
+            return nil  // nothing to lift → let UIKit pick its default target
+        }
+        // The lift hugs the actual trigger content: the union of host's children
+        // minus this container and the tap-mode button. Trims the host's
+        // transparent margins and stays correct for any content — one child or
+        // several (RN flattens nested views into sibling frames). Falls back to
+        // the full host bounds when there's nothing to measure.
+        let contentRect = host.subviews
+            .filter { $0 !== self && !($0 is UIButton) }
+            .reduce(CGRect.null) { $0.union($1.frame) }
+        let rowRect = contentRect.isNull ? host.bounds : contentRect
+
+        liftedHost = host
+        liftedHostParent = host.superview
+        liftedHostIndex = host.superview?.subviews.firstIndex(of: host)
+
         let previewConfig = PreviewConfigParser.parse(json: previewConfigJson)
-
         let parameters = UIPreviewParameters()
-        if let bgColor = previewConfig.backgroundColor {
-            parameters.backgroundColor = bgColor
-        } else {
-            parameters.backgroundColor = .clear
-        }
-        if let radius = previewConfig.borderRadius {
-            parameters.visiblePath = UIBezierPath(
-                roundedRect: bounds,
-                cornerRadius: CGFloat(radius)
-            )
-        }
+        // The live host carries its own content (incl. background); only override
+        // the platter when the app explicitly asks for one.
+        parameters.backgroundColor = previewConfig.backgroundColor ?? .clear
+        parameters.visiblePath = UIBezierPath(
+            roundedRect: rowRect,
+            cornerRadius: previewConfig.borderRadius.map { CGFloat($0) } ?? 0
+        )
 
-        return UITargetedPreview(view: self, parameters: parameters)
+        return UITargetedPreview(view: host, parameters: parameters)
+    }
+
+    /// Re-seat the lifted host at the index Fabric still expects, after the
+    /// menu's dismiss/commit animation and before the list can scroll into an
+    /// unmount. `insertSubview` moves it if UIKit re-seated it elsewhere, or
+    /// re-adds it if UIKit detached it during the lift.
+    private func restoreLiftedHostIndex() {
+        defer { clearLiftedHostRefs() }
+        guard let host = liftedHost,
+              let parent = liftedHostParent,
+              let index = liftedHostIndex
+        else { return }
+
+        if parent.subviews.firstIndex(of: host) != index {
+            parent.insertSubview(host, at: min(index, parent.subviews.count))
+        }
+    }
+
+    private func clearLiftedHostRefs() {
+        liftedHost = nil
+        liftedHostParent = nil
+        liftedHostIndex = nil
     }
 }
 

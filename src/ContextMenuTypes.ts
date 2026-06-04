@@ -3,6 +3,8 @@
  * These types are used on the JS side for DX and serialized as JSON to native.
  */
 
+import type { StyleProp, ViewStyle } from "react-native";
+
 // --- Images ---
 
 export interface SystemImage {
@@ -127,6 +129,14 @@ export interface ContextMenuProps {
   onPreviewPress?: () => void;
   /** Preview customization. */
   previewConfig?: PreviewConfig;
+  /**
+   * Style applied to the wrapper view around the trigger content. This is the
+   * idiomatic place for layout styles — e.g. a fixed row height when used inside
+   * a list. The wrapper is always present (it keeps the native view safe inside
+   * virtualized lists), so sizing the cell here is preferred over wrapping
+   * `ContextMenu` in your own view.
+   */
+  style?: StyleProp<ViewStyle>;
   /** React children rendered as the trigger content. */
   children: React.ReactNode;
 }
