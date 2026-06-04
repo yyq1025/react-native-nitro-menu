@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-`react-native-nitro-contextmenu` — Native context menus for React Native using [Nitro Modules](https://nitro.margelo.cc). iOS uses `UIContextMenuInteraction`, Android uses `PopupMenu`. Single declarative TypeScript API for both platforms.
+`@yyq1025/react-native-nitro-menu` — Native context menus for React Native using [Nitro Modules](https://nitro.margelo.cc). Fork of `react-native-nitro-contextmenu`. iOS uses `UIContextMenuInteraction`, Android uses `PopupMenu`. Single declarative TypeScript API for both platforms.
 
 ## Architecture
 
@@ -58,7 +58,7 @@ cd example/android && ./gradlew assembleDebug
 
 ## Conventions
 
-- Package name: `react-native-nitro-contextmenu`
+- Package name: `@yyq1025/react-native-nitro-menu`
 - Kotlin package: `com.margelo.nitro.nitrocontextmenu`
 - Swift has no module prefix — files live directly in `ios/`
 - The example app imports from the package name, resolving via metro `watchFolders`

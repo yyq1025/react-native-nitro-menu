@@ -15,9 +15,9 @@ config.resolver.nodeModulesPaths = [
   path.resolve(monorepoRoot, 'node_modules'),
 ];
 
-// Force resolution of react-native-nitro-contextmenu to the local package
+// Force resolution of the local package to the monorepo root
 config.resolver.extraNodeModules = {
-  'react-native-nitro-contextmenu': monorepoRoot,
+  '@yyq1025/react-native-nitro-menu': monorepoRoot,
 };
 
 // Ensure we don't have duplicate React instances

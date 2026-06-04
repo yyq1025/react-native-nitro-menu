@@ -16,7 +16,7 @@
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
     "react-native": "0.81.5",
-    "react-native-nitro-contextmenu": "link:react-native-nitro-contextmenu",
+    "@yyq1025/react-native-nitro-menu": "file:..",
     "react-native-nitro-modules": "^0.33.7",
     "react-native-reanimated": "^4.2.1",
     "react-native-safe-area-context": "~5.6.0"

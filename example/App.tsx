@@ -1,7 +1,7 @@
+import type { MenuConfig } from "@yyq1025/react-native-nitro-menu";
+import { ContextMenu } from "@yyq1025/react-native-nitro-menu";
 import { useState } from "react";
 import { Alert, ScrollView, StatusBar, StyleSheet, Text, useColorScheme, View } from "react-native";
-import type { MenuConfig } from "react-native-nitro-contextmenu";
-import { ContextMenu } from "react-native-nitro-contextmenu";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 function App() {
