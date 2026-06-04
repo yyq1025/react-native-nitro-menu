@@ -15,9 +15,6 @@
     "publish": true
   },
   "hooks": {
-    "after:bump": [
-      "bunx auto-changelog --package",
-      "git add CHANGELOG.md package.json"
-    ]
+    "after:bump": ["bunx auto-changelog --package", "git add CHANGELOG.md package.json"]
   }
 }

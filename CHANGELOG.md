@@ -1,52 +1,34 @@
-## Changelog
+# Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project are documented here. This project follows
+[Semantic Versioning](https://semver.org/).
 
-This project adheres to [Calendar Versioning (CalVer)](https://calver.org/).
+## 0.1.0 — 2026-06-03
 
-### [2026.4.2](https://github.com/vineyardbovines/react-native-nitro-contextmenu/compare/2026.4.1...2026.4.2)
+Initial release of this fork, based on
+[`react-native-nitro-contextmenu@2026.4.2`](https://github.com/vineyardbovines/react-native-nitro-contextmenu)
+by Spencer Pope.
 
-### 🐛 Bug Fixes
+### Added
 
-- fix: update nitrogen [`dcf755c`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/dcf755cdfcb5102d6535589b23fc8d7c8ed05396)
+- **Working New Arch long-press lift preview.** The lifted card now renders the
+  live trigger content — text included — by lifting the host view and restoring
+  its index on dismiss/commit, instead of rasterizing (which dropped Fabric
+  paragraph glyphs and raced to a blank card on fast reopen).
+- **List safety.** The native view is hosted in a dedicated, non-collapsible
+  wrapper so the lift no longer desyncs the recycler in virtualized lists
+  (`FlatList` / `SectionList` / LegendList) — avoiding the New Arch "unmount a
+  view which has a different index" crash. No manual wrapping required.
+- **`style` prop**, forwarded to the wrapper, for cell layout (e.g. a fixed row
+  height in a list).
 
-### [2026.4.1](https://github.com/vineyardbovines/react-native-nitro-contextmenu/compare/2026.2.4...2026.4.1)
+### Changed
 
-### 🐛 Bug Fixes
+- Switched versioning from CalVer to SemVer.
+- Rebranded to `@yyq1025/react-native-nitro-menu`. Upstream copyright and
+  attribution are retained (MIT).
 
-- fix: remove hardcoded agp 9.0.0 buildscript block [`a706f77`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/a706f77bdca6dba3e2a19d8ecd61b55a09358597)
+---
 
-### 🧹 Chores
-
-- chore: release 2026.4.1 [`91af4d9`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/91af4d9c3f020c8b9d9da28704814b04fe6f2719)
-### [2026.2.4](https://github.com/vineyardbovines/react-native-nitro-contextmenu/compare/2026.2.3...2026.2.4)
-
-### 🐛 Bug Fixes
-
-- fix: menu config callback [`6c1dbf7`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/6c1dbf7e8ca8208966ece9cff3484778b9210c1a)
-
-### 🧹 Chores
-
-- chore: release 2026.2.4 [`2404476`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/240447691cf3245dd2de252fc07cbd0592ca526e)
-### [2026.2.3](https://github.com/vineyardbovines/react-native-nitro-contextmenu/compare/2026.2.2...2026.2.3)
-
-### 🐛 Bug Fixes
-
-- fix: preferred element sizing in tabbed menu [`bbf3aed`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/bbf3aed3a8147d8c71545c1337fb55dfd4faad55)
-
-### 🧹 Chores
-
-- chore: release 2026.2.3 [`e12acbe`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/e12acbe90b3560526960032ce8a06e0266af086a)
-### [2026.2.2](https://github.com/vineyardbovines/react-native-nitro-contextmenu/compare/2026.2.1...2026.2.2)
-
-### 🧹 Chores
-
-- chore: release 2026.2.2 [`d3ed2db`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/d3ed2db0250fabeda91e113f778c0b963d403175)
-- chore: use auto-changelog [`571b585`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/571b585877d188b4ea1ad7c3322f6d3e831f0354)
-- chore: use release-it [`ffb4569`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/ffb4569566823e6553c6b38897ed28c423546aeb)
-### 2026.2.1
-
-### 🧹 Chores
-
-- chore: update gitignore [`31045c3`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/31045c310ba234f2e18fee3a83b822b7ef0b1ce3)
-- chore: initial commit [`03a8bb5`](https://github.com/vineyardbovines/react-native-nitro-contextmenu/commit/03a8bb54f05d1b0de53b8dd8e8fabd4ae6d287f8)
+Pre-fork history (released as `react-native-nitro-contextmenu`) lives in the
+[upstream changelog](https://github.com/vineyardbovines/react-native-nitro-contextmenu/blob/main/CHANGELOG.md).
