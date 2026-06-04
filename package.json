@@ -1,6 +1,6 @@
 {
   "name": "@yyq1025/react-native-nitro-menu",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Native iOS & Android menus — tap menus and long-press context menus with a working lift preview — built with Nitro Modules. Fork of react-native-nitro-contextmenu.",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",

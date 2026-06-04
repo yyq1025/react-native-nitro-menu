@@ -84,6 +84,22 @@ function MyComponent() {
 
 > Using a CSS-in-JS library (NativeWind / uniwind)? Register the component once so `className` maps to `style`: `cssInterop(ContextMenu, { className: "style" })`. The library itself stays styling-agnostic and only accepts a plain `style`.
 
+## Tappable triggers
+
+A `longPress` trigger and a tap coexist — handy for rows that open on tap and show a menu on long-press. Put a `Pressable` as the trigger content: a tap fires its `onPress`, a long-press opens the menu (iOS arbitrates the two by duration).
+
+Use [`react-native-gesture-handler`](https://docs.swmansion.com/react-native-gesture-handler/)'s `Pressable`, **not** React Native's — RN's `Pressable` loses the tap to the native long-press, whereas RNGH's native recognizer arbitrates correctly. Wrap your app (or screen) in `GestureHandlerRootView`.
+
+```tsx
+import { Pressable } from "react-native-gesture-handler";
+
+<ContextMenu trigger="longPress" menuConfig={rowMenu(item)} style={{ height: 52 }}>
+  <Pressable onPress={() => openItem(item)} style={styles.row}>
+    <Text>{item.title}</Text>
+  </Pressable>
+</ContextMenu>;
+```
+
 ## Props
 
 | Prop              | Type                          | Description                                               |

@@ -43,6 +43,9 @@ private class ContextMenuContainerView: UIView, UIContextMenuInteractionDelegate
     private var menuButton: UIButton?
     private var tabState = TabState()
     private var trigger: String = "tap"
+    /// The view the long-press interaction is attached to — the Fabric host that
+    /// actually contains the RN children, NOT `self`. See `syncInteraction()`.
+    private weak var interactionHost: UIView?
     /// The host view we hand to the context-menu lift, plus where it sat in its
     /// own superview. UIKit reparents the lifted view during the animation and
     /// re-seats it at the wrong index afterwards; we restore the original index
@@ -79,10 +82,49 @@ private class ContextMenuContainerView: UIView, UIContextMenuInteractionDelegate
         switchToButtonMode()
     }
 
-    private func setupInteraction() {
-        let interaction = UIContextMenuInteraction(delegate: self)
-        self.interaction = interaction
-        addInteraction(interaction)
+    /// Attach the long-press interaction to the HOST (our superview) — the view
+    /// that actually holds the RN children — rather than to `self`. `self` is a
+    /// transparent sibling overlay of the content: an interaction here can't
+    /// observe touches on the children, and the overlay also swallows taps, so a
+    /// child `Pressable` never sees them. With the interaction on the host, the
+    /// children are descendants, so long-press is observed AND a child (RNGH)
+    /// `Pressable` still receives the tap — UIKit arbitrates the two by duration.
+    /// Mirrors the Fabric sibling project, whose interaction view contains its
+    /// children directly.
+    private func syncInteraction() {
+        let desiredHost: UIView? = (trigger == "longPress") ? superview : nil
+
+        if interactionHost !== desiredHost, let interaction, let old = interactionHost {
+            old.removeInteraction(interaction)
+            interactionHost = nil
+        }
+
+        guard let desiredHost else {
+            interaction = nil
+            return
+        }
+
+        let inter = interaction ?? UIContextMenuInteraction(delegate: self)
+        interaction = inter
+        if interactionHost == nil {
+            desiredHost.addInteraction(inter)
+            interactionHost = desiredHost
+        }
+    }
+
+    override func didMoveToSuperview() {
+        super.didMoveToSuperview()
+        // The host (superview) is where the interaction must live; (re)bind it
+        // whenever we're (re)parented or torn down.
+        syncInteraction()
+    }
+
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let hit = super.hitTest(point, with: event)
+        // Let touches on our own empty, transparent area fall through to the
+        // content sibling below, so a tap reaches the RN children's Pressable.
+        // Keep hits on real subviews (the tap-mode button overlay).
+        return hit === self ? nil : hit
     }
 
     private func configDidChange() {
@@ -103,11 +145,8 @@ private class ContextMenuContainerView: UIView, UIContextMenuInteractionDelegate
     }
 
     private func switchToButtonMode() {
-        // Remove long-press interaction
-        if let interaction = interaction {
-            removeInteraction(interaction)
-            self.interaction = nil
-        }
+        // Drop the long-press interaction (it lives on the host, not self).
+        syncInteraction()
 
         // Add a transparent button overlay
         if #available(iOS 14.0, *) {
@@ -129,10 +168,8 @@ private class ContextMenuContainerView: UIView, UIContextMenuInteractionDelegate
         menuButton?.removeFromSuperview()
         menuButton = nil
 
-        // Re-add long-press interaction
-        if interaction == nil {
-            setupInteraction()
-        }
+        // Bind the long-press interaction to the host.
+        syncInteraction()
     }
 
     private func rebuildButtonMenu() {

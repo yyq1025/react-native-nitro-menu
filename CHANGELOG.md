@@ -3,6 +3,19 @@
 All notable changes to this project are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## 0.2.0 — 2026-06-04
+
+### Fixed
+
+- **Taps now reach the trigger content** under `trigger="longPress"`. The
+  long-press interaction is hosted on the children's container and the internal
+  overlay passes touches through, so a child `Pressable` receives `onPress` while
+  a long-press still opens the menu — tap and context menu coexist (UIKit
+  arbitrates by duration). Previously the overlay swallowed the tap. Use
+  [`react-native-gesture-handler`](https://docs.swmansion.com/react-native-gesture-handler/)'s
+  `Pressable` (React Native's loses the tap to the native long-press). See
+  [Tappable triggers](README.md#tappable-triggers).
+
 ## 0.1.0 — 2026-06-03
 
 Initial release of this fork, based on
